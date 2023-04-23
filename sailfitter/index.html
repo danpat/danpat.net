@@ -116,12 +116,19 @@ function drawSail(sailname,strop,color,lp=false) {
   if (lp) {
     const lp = document.getElementById("lp");
     lp.textContent = '';
-    const lp_height = Math.cos(angleC) * pixel_foot;
-    const lp_top = [ strop_tack[0] - lp_height * Math.cos(angle), strop_tack[1] - lp_height * Math.sin(angle) ];
+
+    
+    const pixel_neutral = pixel_luff / 2;
+    const lp_top = [ strop_tack[0] - pixel_neutral * Math.cos(angle), strop_tack[1] - pixel_neutral * Math.sin(angle) ];
     addCircle(lp_top,fill="blue",radius=50,"lp");
 
+    // Law of cosines to find the angle at the tack
+    const d = distance(lp_top,newfoot);
+    const angleX = Math.acos((Math.pow(pixel_foot,2) - Math.pow(pixel_luff/2,2) - Math.pow(d,2))/(-2 * pixel_luff/2 * d));
+
     const lp_line = 30*12 * scale; // 20 ft
-    const lp_bottom = [ lp_top[0] - lp_line * Math.cos(angle + 270*Math.PI/180), lp_top[1] - lp_line * Math.sin(angle+270*Math.PI/180) ];
+    const lp_bottom = [ lp_top[0] - lp_line * Math.cos(angle + angleX + Math.PI), lp_top[1] - lp_line * Math.sin(angle + angleX + Math.PI) ];
+
 
     const line = document.createElementNS(svgNS,"line");
     line.setAttributeNS(null,"stroke","red");
