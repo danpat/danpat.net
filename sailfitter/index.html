@@ -1,0 +1,132 @@
+<!html>
+<head>
+</head>
+<body>
+P=43'4" = 520"<br/>
+Furler tack = 24"<br/>
+Main Luff <input type="text" id="main_luff" value="43'5&quot;"/><br/>
+Main Foot <input type="text" id="main_foot" value="13'0&quot;"/><br/>
+Main Leech <input type="text" id="main_leech" value="44'0&quot""/><br/>
+
+Genoa Luff <input type="text" id="genoa_luff" value="43'5&quot;"><br/>
+Genoa Foot <input type="text" id="genoa_foot" value="21'10&quot;"/><br/>
+Genoa Leech <input type="text" id="genoa_leech" value="42'3&quot;"/><br/>
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 6954 9422" width="1000" height="1000" id="sailplan">
+  <image width="6954" height="9422" xlink:href="sailplan.jpg" />
+  <g id="markers">
+  </g>
+  <g id="genoa"></g>
+  <g id="main"></g>
+</svg>
+<script type="text/javascript">
+// x,y from top-left
+const P="43'4\"";
+const rigging = {
+  main: {
+    top: [3110,489],
+    tack: [3264,6945],
+  },
+  genoa: {
+    tack: [6048,7359],
+    top: [3321,561],
+  }
+}
+const scale = distance(rigging.main.top,rigging.main.tack) / parseMeasurement(P); // pixels/inch
+
+const sailplan = document.getElementById("markers");
+
+function addCircle(coord,fill="red",radius=50) {
+    var svgNS = "http://www.w3.org/2000/svg";
+    var circle = document.createElementNS(svgNS,"circle");
+    circle.setAttributeNS(null,"cx",coord[0]);
+    circle.setAttributeNS(null,"cy",coord[1]);
+    circle.setAttributeNS(null,"r", radius);
+    circle.setAttributeNS(null,"stroke","black");
+    circle.setAttributeNS(null,"stroke-width",3);
+    circle.setAttributeNS(null,"fill",fill);
+    sailplan.appendChild(circle);
+}
+
+addCircle(rigging.main.top);
+addCircle(rigging.main.tack);
+addCircle(rigging.genoa.top);
+addCircle(rigging.genoa.tack);
+
+function parseMeasurement(value) {
+  let feet = parseInt(value.split(/'/)[0]);
+  let inches = parseInt(value.split(/'/)[1]);
+  return feet * 12 + inches;
+}
+
+function distance(a,b) {
+  return Math.sqrt(Math.pow(a[0]-b[0],2) + Math.pow(a[1]-b[1],2));
+}
+
+function findClew() {
+}
+
+function radians_to_degrees(radians)
+{
+  var pi = Math.PI;
+  return radians * (180/pi);
+}
+
+function drawSail(sailname,strop,color) {
+
+  const sail = rigging[sailname];
+
+  const angle = Math.atan((sail.tack[1]-sail.top[1])/(sail.tack[0]-sail.top[0]));
+
+  const pixel_strop = strop * scale;
+  const strop_tack = [ sail.tack[0] - pixel_strop * Math.cos(angle), sail.tack[1] - pixel_strop * Math.sin(angle) ];
+
+  const luff = document.getElementById(`${sailname}_luff`).value;
+  const pixel_luff = parseMeasurement(luff) * scale;
+  const newtop = [ strop_tack[0] - pixel_luff * Math.cos(angle), strop_tack[1] - pixel_luff * Math.sin(angle) ];
+
+  const leech = document.getElementById(`${sailname}_leech`).value;
+  const pixel_leech = parseMeasurement(leech) * scale;
+
+  const foot = document.getElementById(`${sailname}_foot`).value;
+  const pixel_foot = parseMeasurement(foot) * scale;
+
+  // Law of cosines to find the angle at the tack
+  const angleC = Math.acos((Math.pow(pixel_leech,2) - Math.pow(pixel_luff,2) - Math.pow(pixel_foot,2))/(-2 * pixel_luff * pixel_foot));
+
+  // Then project that angle plus the foot length to find the location of the clew
+  const newfoot = [ strop_tack[0] - pixel_foot * Math.cos(angle-angleC), strop_tack[1] - pixel_foot * Math.sin(angle-angleC) ];
+
+  const sailelement = document.getElementById(sailname);
+  sailelement.textContent = '';
+
+  const points = `${strop_tack.join(',')} ${newtop.join(',')} ${newfoot.join(',')}`;
+
+  var svgNS = "http://www.w3.org/2000/svg";
+  var polygon = document.createElementNS(svgNS,"polygon");
+  polygon.setAttributeNS(null,"stroke","black");
+  polygon.setAttributeNS(null,"stroke-width",3);
+  polygon.setAttributeNS(null,"fill",color);
+  polygon.setAttributeNS(null,"points", points);
+  sailelement.appendChild(polygon);
+}
+
+
+const redraw = function() {
+  drawSail("genoa",24,"rgba(245,173,55,0.30)");
+  drawSail("main",0,"rgba(66, 102, 245,0.30)");
+}
+
+redraw();
+
+const matches = document.querySelectorAll("input");
+
+matches.forEach((match) => {
+  match.addEventListener('input', redraw);
+});
+
+
+</script>
+</body>
+</html>
