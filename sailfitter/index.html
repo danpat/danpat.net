@@ -15,14 +15,21 @@ Genoa Leech <input type="text" id="genoa_leech" value="42'3&quot;"/><br/>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 6954 9422" width="1000" height="1000" id="sailplan">
   <image width="6954" height="9422" xlink:href="sailplan.jpg" />
-  <g id="markers">
-  </g>
+  <g id="markers"></g>
   <g id="genoa"></g>
   <g id="main"></g>
+  <g id="track"></g>
+  <g id="lp"></g>
 </svg>
 <script type="text/javascript">
 // x,y from top-left
 const P="43'4\"";
+
+const track = {
+  start: [2470,7790],
+  end: [1437,7776],
+};
+
 const rigging = {
   main: {
     top: [3110,489],
@@ -35,18 +42,18 @@ const rigging = {
 }
 const scale = distance(rigging.main.top,rigging.main.tack) / parseMeasurement(P); // pixels/inch
 
-const sailplan = document.getElementById("markers");
+const svgNS = "http://www.w3.org/2000/svg";
 
-function addCircle(coord,fill="red",radius=50) {
-    var svgNS = "http://www.w3.org/2000/svg";
-    var circle = document.createElementNS(svgNS,"circle");
+function addCircle(coord,fill="red",radius=50,parent="markers") {
+    const circle = document.createElementNS(svgNS,"circle");
     circle.setAttributeNS(null,"cx",coord[0]);
     circle.setAttributeNS(null,"cy",coord[1]);
     circle.setAttributeNS(null,"r", radius);
     circle.setAttributeNS(null,"stroke","black");
     circle.setAttributeNS(null,"stroke-width",3);
     circle.setAttributeNS(null,"fill",fill);
-    sailplan.appendChild(circle);
+    const parent_element = document.getElementById(parent);
+    parent_element.appendChild(circle);
 }
 
 addCircle(rigging.main.top);
@@ -67,13 +74,7 @@ function distance(a,b) {
 function findClew() {
 }
 
-function radians_to_degrees(radians)
-{
-  var pi = Math.PI;
-  return radians * (180/pi);
-}
-
-function drawSail(sailname,strop,color) {
+function drawSail(sailname,strop,color,lp=false) {
 
   const sail = rigging[sailname];
 
@@ -103,20 +104,52 @@ function drawSail(sailname,strop,color) {
 
   const points = `${strop_tack.join(',')} ${newtop.join(',')} ${newfoot.join(',')}`;
 
-  var svgNS = "http://www.w3.org/2000/svg";
-  var polygon = document.createElementNS(svgNS,"polygon");
+  const svgNS = "http://www.w3.org/2000/svg";
+  const polygon = document.createElementNS(svgNS,"polygon");
   polygon.setAttributeNS(null,"stroke","black");
   polygon.setAttributeNS(null,"stroke-width",3);
   polygon.setAttributeNS(null,"fill",color);
   polygon.setAttributeNS(null,"points", points);
   sailelement.appendChild(polygon);
+
+  if (lp) {
+    const lp = document.getElementById("lp");
+    lp.textContent = '';
+    const lp_height = Math.cos(angleC) * pixel_foot;
+    const lp_top = [ strop_tack[0] - lp_height * Math.cos(angle), strop_tack[1] - lp_height * Math.sin(angle) ];
+    addCircle(lp_top,fill="blue",radius=50,"lp");
+
+    const lp_line = 30*12 * scale; // 20 ft
+    const lp_bottom = [ lp_top[0] - lp_line * Math.cos(angle + 270*Math.PI/180), lp_top[1] - lp_line * Math.sin(angle+270*Math.PI/180) ];
+
+    const line = document.createElementNS(svgNS,"line");
+    line.setAttributeNS(null,"stroke","red");
+    line.setAttributeNS(null,"stroke-dasharray","20 40 20");
+    line.setAttributeNS(null,"stroke-width","20");
+    line.setAttributeNS(null,"x1", lp_top[0]);
+    line.setAttributeNS(null,"y1", lp_top[1]);
+    line.setAttributeNS(null,"x2", lp_bottom[0]);
+    line.setAttributeNS(null,"y2", lp_bottom[1]);
+    lp.appendChild(line);
+  }
 }
 
 
 const redraw = function() {
-  drawSail("genoa",24,"rgba(245,173,55,0.30)");
-  drawSail("main",0,"rgba(66, 102, 245,0.30)");
+  drawSail("genoa",24,"rgba(245,173,55,0.30)",true);
+  drawSail("main",0,"rgba(66, 102, 245,0.30)",false);
 }
+
+    const line = document.createElementNS(svgNS,"line");
+    line.setAttributeNS(null,"stroke","red");
+    line.setAttributeNS(null,"stroke-width","40");
+    line.setAttributeNS(null,"x1", track.start[0]);
+    line.setAttributeNS(null,"y1", track.start[1]);
+    line.setAttributeNS(null,"x2", track.end[0]);
+    line.setAttributeNS(null,"y2", track.end[1]);
+    const track_element = document.getElementById("track");
+    track_element.textContent = '';
+    track_element.appendChild(line);
 
 redraw();
 
