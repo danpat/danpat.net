@@ -105,9 +105,11 @@
     width: 100%;
     height: 4px;
     border-radius: 99px;
-    background: linear-gradient(90deg, #e39a45, #f3e0c4 42%, #f7f5f1 68%, #c5d4ee);
     outline: none;
   }
+  #kelvin { background: linear-gradient(90deg, #e39a45, #f3e0c4 42%, #f7f5f1 68%, #c5d4ee); }
+  #brightness { background: linear-gradient(90deg, #d9d3c8, #2c2824); }
+  .light-gap { margin-top: 14px; }
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 18px; height: 18px;
@@ -275,6 +277,11 @@
       <button type="button" data-k="4000">4000K</button>
       <button type="button" data-k="5000">5000K</button>
     </div>
+    <div class="row-label light-gap">
+      <label for="brightness">Brightness</label>
+      <output id="brightness-out" for="brightness">50%</output>
+    </div>
+    <input id="brightness" type="range" min="0" max="100" step="1" value="50">
   </section>
 
   <section>
@@ -309,18 +316,16 @@
 const MODEL = {"positions":"CZabQAAAAACN+lzA6CuaPwAAAAB+BtDA6CuaPwAAAACN+lzA6CuaPwAAAAB+BtDACZabQAAAAACN+lzACZabQAAAAAB+BtDACZabQL8OHEB+BtDA6CuaPwAAAAB+BtDACZabQAAAAAB+BtDA6CuaPwAAAAB+BtDACZabQL8OHEB+BtDA6CuaP78OHEB+BtDA6CuaP2KhjT/Q3q/A6CuaP0oMAkA+za/A6CuaP50RkD8+za/A6CuaPwAAAACN+lzA6CuaP2KhjT/On27A6CuaP4NROUCN+lzA6CuaP2KhjT/On27A6CuaPwAAAACN+lzA6CuaPwAAAAB+BtDA6CuaP2KhjT/On27A6CuaPwAAAAB+BtDA6CuaP2KhjT/Q3q/A6CuaP4NROUCN+lzA6CuaP0oMAkDOn27A6CuaP78OHEB+BtDA6CuaP0oMAkDOn27A6CuaP4NROUCN+lzA6CuaP2KhjT/On27A6CuaP78OHEB+BtDA6CuaP0oMAkDOn27A6CuaP0oMAkA+za/A6CuaP78OHEB+BtDA6CuaP0oMAkA+za/A6CuaP2KhjT/Q3q/A6CuaP78OHEB+BtDA6CuaP2KhjT/Q3q/A6CuaPwAAAAB+BtDA6CuaPwAAAACN+lzAmu7pPyKOFT+N+lzACZabQAAAAACN+lzAmu7pPyKOFT+N+lzA6CuaPwAAAACN+lzA6CuaP4NROUCN+lzAmu7pPyKOFT+N+lzA6CuaP4NROUCN+lzAmu7pP78OHD+N+lzAmu7pP78OHD+N+lzA6CuaP4NROUCN+lzAmu7pP0oMAkCN+lzAmu7pP0oMAkCN+lzA6CuaP4NROUCN+lzA/fobQEoMAkCN+lzA/fobQEoMAkCN+lzA6CuaP4NROUCN+lzA0mM/QEoMAkCN+lzA0mM/QEoMAkCN+lzA6CuaP4NROUCN+lzA1LaTQEoMAkCN+lzACZabQAAAAACN+lzA1LaTQCKOFT+N+lzACZabQINROUCN+lzA1LaTQCKOFT+N+lzACZabQAAAAACN+lzAmu7pPyKOFT+N+lzACZabQINROUCN+lzA1LaTQCKOFT+N+lzA1LaTQL8OHD+N+lzACZabQINROUCN+lzA1LaTQL8OHD+N+lzA1LaTQEoMAkCN+lzACZabQINROUCN+lzA1LaTQEoMAkCN+lzA6CuaP4NROUCN+lzA0mM/QL8OHD+N+lzA/fobQL8OHD+N+lzA/fobQEoMAkCN+lzA0mM/QL8OHD+N+lzA/fobQEoMAkCN+lzA0mM/QEoMAkCN+lzACZabQINROUCN+lzACZabQEoMAkA7ymnACZabQAAAAACN+lzACZabQEoMAkA7ymnACZabQINROUCN+lzACZabQL8OHEB+BtDACZabQEoMAkA7ymnACZabQL8OHEB+BtDACZabQEoMAkBYN6zACZabQEoMAkBYN6zACZabQL8OHEB+BtDACZabQHGsA0DQ/rbACZabQEoMAkBYN6zACZabQHGsA0DQ/rbACZabQAAAAABYN6zACZabQHGsA0DQ/rbACZabQL8OHEB+BtDACZabQHGsA0CngMrACZabQHGsA0CngMrACZabQL8OHEB+BtDACZabQL8OHD+ngMrACZabQL8OHD+ngMrACZabQL8OHEB+BtDACZabQCKOFT+ngMrACZabQAAAAABYN6zACZabQCKOFT/Q/rbACZabQAAAAAB+BtDACZabQCKOFT/Q/rbACZabQAAAAABYN6zACZabQHGsA0DQ/rbACZabQAAAAAB+BtDACZabQCKOFT/Q/rbACZabQCKOFT+ngMrACZabQAAAAAB+BtDACZabQCKOFT+ngMrACZabQL8OHEB+BtDACZabQAAAAAA7ymnACZabQAAAAACN+lzACZabQEoMAkA7ymnA/fobQL8OHD+N+lzA0mM/QCKOFT+N+lzA/fobQCKOFT+N+lzA0mM/QCKOFT+N+lzA/fobQL8OHD+N+lzA0mM/QL8OHD+N+lzArSqNP50RkD8+za/ArSqNP2KhjT/On27ArSqNP50RkD/On27ArSqNP2KhjT/On27ArSqNP50RkD8+za/ArSqNP2KhjT/Q3q/A6CuaP50RkD/On27ArSqNP50RkD8+za/ArSqNP50RkD/On27ArSqNP50RkD8+za/A6CuaP50RkD/On27A6CuaP50RkD8+za/A6CuaP50RkD8+za/A6CuaP50RkD/On27ANmydP50RkD/On27A6CuaP50RkD8+za/ANmydP50RkD/On27ANmydP50RkD8+za/A6CuaP50RkD/On27ArSqNP2KhjT/On27A6CuaP2KhjT/On27ArSqNP2KhjT/On27A6CuaP50RkD/On27ArSqNP50RkD/On27A6CuaP2KhjT/Q3q/ArSqNP2KhjT/On27ArSqNP2KhjT/Q3q/ArSqNP2KhjT/On27A6CuaP2KhjT/Q3q/A6CuaP2KhjT/On27ArSqNP50RkD8+za/A6CuaP2KhjT/Q3q/ArSqNP2KhjT/Q3q/A6CuaP2KhjT/Q3q/ArSqNP50RkD8+za/A6CuaP50RkD8+za/ANmydP2KhjT/Q3q/ANmydP50RkD/On27ANmydP2KhjT/On27ANmydP50RkD/On27ANmydP2KhjT/Q3q/ANmydP50RkD8+za/ANmydP50RkD/On27A6CuaP2KhjT/On27ANmydP2KhjT/On27A6CuaP2KhjT/On27ANmydP50RkD/On27A6CuaP50RkD/On27ANmydP2KhjT/Q3q/A6CuaP2KhjT/On27A6CuaP2KhjT/Q3q/A6CuaP2KhjT/On27ANmydP2KhjT/Q3q/ANmydP2KhjT/On27A6CuaP50RkD8+za/ANmydP2KhjT/Q3q/A6CuaP2KhjT/Q3q/ANmydP2KhjT/Q3q/A6CuaP50RkD8+za/ANmydP50RkD8+za/A/fobQL8OHD/veVbAmu7pPyKOFT/veVbA/fobQCKOFT/veVbAmu7pPyKOFT/veVbA/fobQL8OHD/veVbAmu7pP78OHD/veVbA/fobQL8OHD/veVbAmu7pP78OHD+N+lzAmu7pP78OHD/veVbAmu7pP78OHD+N+lzA/fobQL8OHD/veVbAmu7pP78OHD+0ml7Amu7pP78OHD+0ml7A/fobQL8OHD/veVbA/fobQL8OHD+0ml7A/fobQCKOFT+N+lzA/fobQL8OHD/veVbA/fobQCKOFT/veVbA/fobQL8OHD/veVbA/fobQCKOFT+N+lzA/fobQL8OHD+N+lzA/fobQCKOFT+N+lzAmu7pPyKOFT/veVbAmu7pPyKOFT+N+lzAmu7pPyKOFT/veVbA/fobQCKOFT+N+lzA/fobQCKOFT/veVbAmu7pP78OHD+N+lzAmu7pPyKOFT/veVbAmu7pP78OHD/veVbAmu7pPyKOFT/veVbAmu7pP78OHD+N+lzAmu7pPyKOFT+N+lzA1LaTQL8OHD/veVbA0mM/QCKOFT/veVbA1LaTQCKOFT/veVbA0mM/QCKOFT/veVbA1LaTQL8OHD/veVbA0mM/QL8OHD/veVbA1LaTQL8OHD/veVbA0mM/QL8OHD+N+lzA0mM/QL8OHD/veVbA0mM/QL8OHD+N+lzA1LaTQL8OHD/veVbA0mM/QL8OHD+0ml7A0mM/QL8OHD+0ml7A1LaTQL8OHD/veVbA1LaTQL8OHD+0ml7A1LaTQCKOFT+N+lzA1LaTQL8OHD/veVbA1LaTQCKOFT/veVbA1LaTQL8OHD/veVbA1LaTQCKOFT+N+lzA1LaTQL8OHD+N+lzA1LaTQCKOFT+N+lzA0mM/QCKOFT/veVbA0mM/QCKOFT+N+lzA0mM/QCKOFT/veVbA1LaTQCKOFT+N+lzA1LaTQCKOFT/veVbA0mM/QL8OHD+N+lzA0mM/QCKOFT/veVbA0mM/QL8OHD/veVbA0mM/QCKOFT/veVbA0mM/QL8OHD+N+lzA0mM/QCKOFT+N+lzA0mM/QL8OHD+0ml7A1LaTQCKOFT+0ml7A0mM/QCKOFT+0ml7A1LaTQCKOFT+0ml7A0mM/QL8OHD+0ml7A1LaTQL8OHD+0ml7A1LaTQCKOFT+0ml7A1LaTQL8OHD+N+lzA1LaTQCKOFT+N+lzA1LaTQL8OHD+N+lzA1LaTQCKOFT+0ml7A1LaTQL8OHD+0ml7A1LaTQCKOFT+0ml7A0mM/QCKOFT+N+lzA0mM/QCKOFT+0ml7A0mM/QCKOFT+N+lzA1LaTQCKOFT+0ml7A1LaTQCKOFT+N+lzA0mM/QL8OHD+0ml7A0mM/QCKOFT+N+lzA0mM/QL8OHD+N+lzA0mM/QCKOFT+N+lzA0mM/QL8OHD+0ml7A0mM/QCKOFT+0ml7Amu7pP78OHD+0ml7A/fobQCKOFT+0ml7Amu7pPyKOFT+0ml7A/fobQCKOFT+0ml7Amu7pP78OHD+0ml7A/fobQL8OHD+0ml7A/fobQCKOFT+0ml7A/fobQL8OHD+N+lzA/fobQCKOFT+N+lzA/fobQL8OHD+N+lzA/fobQCKOFT+0ml7A/fobQL8OHD+0ml7A/fobQCKOFT+0ml7Amu7pPyKOFT+N+lzAmu7pPyKOFT+0ml7Amu7pPyKOFT+N+lzA/fobQCKOFT+0ml7A/fobQCKOFT+N+lzAmu7pP78OHD+0ml7Amu7pPyKOFT+N+lzAmu7pP78OHD+N+lzAmu7pPyKOFT+N+lzAmu7pP78OHD+0ml7Amu7pPyKOFT+0ml7AWNaeQCKOFT+ngMrAWNaeQL8OHD/Q/rbAWNaeQCKOFT/Q/rbAWNaeQL8OHD/Q/rbAWNaeQCKOFT+ngMrAWNaeQL8OHD+ngMrACZabQL8OHD/Q/rbA9cWaQL8OHD+ngMrA9cWaQL8OHD/Q/rbA9cWaQL8OHD+ngMrACZabQL8OHD/Q/rbACZabQL8OHD+ngMrACZabQL8OHD+ngMrACZabQL8OHD/Q/rbAWNaeQL8OHD/Q/rbACZabQL8OHD+ngMrAWNaeQL8OHD/Q/rbAWNaeQL8OHD+ngMrACZabQL8OHD+ngMrAWNaeQCKOFT+ngMrACZabQCKOFT+ngMrAWNaeQCKOFT+ngMrACZabQL8OHD+ngMrAWNaeQL8OHD+ngMrAWNaeQCKOFT+ngMrACZabQCKOFT/Q/rbACZabQCKOFT+ngMrACZabQCKOFT/Q/rbAWNaeQCKOFT+ngMrAWNaeQCKOFT/Q/rbAWNaeQL8OHD/Q/rbACZabQCKOFT/Q/rbAWNaeQCKOFT/Q/rbACZabQCKOFT/Q/rbAWNaeQL8OHD/Q/rbACZabQL8OHD/Q/rbA9cWaQL8OHD+ngMrA9cWaQCKOFT/Q/rbA9cWaQL8OHD/Q/rbA9cWaQCKOFT/Q/rbA9cWaQL8OHD+ngMrA9cWaQCKOFT+ngMrA9cWaQL8OHD+ngMrACZabQCKOFT+ngMrA9cWaQCKOFT+ngMrACZabQCKOFT+ngMrA9cWaQL8OHD+ngMrACZabQL8OHD+ngMrACZabQCKOFT+ngMrA9cWaQCKOFT/Q/rbA9cWaQCKOFT+ngMrA9cWaQCKOFT/Q/rbACZabQCKOFT+ngMrACZabQCKOFT/Q/rbACZabQL8OHD/Q/rbA9cWaQCKOFT/Q/rbACZabQCKOFT/Q/rbA9cWaQCKOFT/Q/rbACZabQL8OHD/Q/rbA9cWaQL8OHD/Q/rbAIMZ3QD+0JUDQ3q/AnvB3QEh8L0AKRI/AFcZ3QDesL0BDpI7AnvB3QEh8L0AKRI/AIMZ3QD+0JUDQ3q/AqvB3QC7kJUAJP6/AnvB3QEh8L0AKRI/AqvB3QC7kJUAJP6/AV214QJ5PL0Dt2I/AV214QJ5PL0Dt2I/AqvB3QC7kJUAJP6/AYm14QNkQJkAnqq7AV214QJ5PL0Dt2I/AYm14QNkQJkAnqq7AvzN5QEIpL0DHWJDAvzN5QEIpL0DHWJDAYm14QNkQJkAnqq7AyjN5QDQ3JkBMKq7AvzN5QEIpL0DHWJDAyjN5QDQ3JkBMKq7AUDZ6QNQLL0DiupDAUDZ6QNQLL0DiupDAyjN5QDQ3JkBMKq7AWzZ6QKNUJkAxyK3AUDZ6QNQLL0DiupDAWzZ6QKNUJkAxyK3AamN7QFT5LkCO+JDAamN7QFT5LkCO+JDAWzZ6QKNUJkAxyK3AdmN7QCNnJkCFiq3AamN7QFT5LkCO+JDAdmN7QCNnJkCFiq3AiqZ8QATzLkCWDZHAiqZ8QATzLkCWDZHAdmN7QCNnJkCFiq3AlqZ8QHJtJkB9da3AiqZ8QATzLkCWDZHAlqZ8QHJtJkB9da3Aq+l9QFT5LkCO+JDAq+l9QFT5LkCO+JDAlqZ8QHJtJkB9da3Atul9QCNnJkCFiq3Aq+l9QFT5LkCO+JDAtul9QCNnJkCFiq3AxRZ/QNQLL0DiupDAxRZ/QNQLL0DiupDAtul9QCNnJkCFiq3A0RZ/QKNUJkAxyK3AxRZ/QNQLL0DiupDA0RZ/QKNUJkAxyK3AqwyAQEIpL0DHWJDAqwyAQEIpL0DHWJDA0RZ/QKNUJkAxyK3AsAyAQDQ3JkBMKq7AqwyAQEIpL0DHWJDAsAyAQDQ3JkBMKq7A3m+AQJ5PL0Dt2I/A3m+AQJ5PL0Dt2I/AsAyAQDQ3JkBMKq7A5G+AQNkQJkAnqq7A3m+AQJ5PL0Dt2I/A5G+AQNkQJkAnqq7AO66AQEh8L0AKRI/AO66AQEh8L0AKRI/A5G+AQNkQJkAnqq7AQK6AQC7kJUAJP6/AO66AQEh8L0AKRI/AQK6AQC7kJUAJP6/AgMOAQDesL0BDpI7AgMOAQDesL0BDpI7AQK6AQC7kJUAJP6/AhsOAQD+0JUDQ3q/A6CuaP78OHEB+BtDAoOUCQBCIJUAbcrDA6CuaP4NROUCN+lzAoOUCQBCIJUAbcrDA6CuaP78OHEB+BtDAWWIDQGVbJUD/BrHAWWIDQGVbJUD/BrHA6CuaP78OHEB+BtDAwCgEQAo1JUDYhrHAwCgEQAo1JUDYhrHA6CuaP78OHEB+BtDAUSsFQJwXJUDz6LHAUSsFQJwXJUDz6LHA6CuaP78OHEB+BtDAa1gGQBsFJUCfJrLAa1gGQBsFJUCfJrLA6CuaP78OHEB+BtDACZabQL8OHEB+BtDA6CuaP4NROUCN+lzAoOUCQBCIJUAbcrDAFrsCQP+3JUBV0q/A6CuaP4NROUCN+lzAFrsCQP+3JUBV0q/ABbsCQDesL0BDpI7Aa1gGQBsFJUCfJrLACZabQL8OHEB+BtDAjJsHQMz+JECoO7LAjJsHQMz+JECoO7LACZabQL8OHEB+BtDArN4IQBsFJUCfJrLArN4IQBsFJUCfJrLACZabQL8OHEB+BtDAxwsKQJwXJUDz6LHAxwsKQJwXJUDz6LHACZabQL8OHEB+BtDAVw4LQAo1JUDYhrHAVw4LQAo1JUDYhrHACZabQL8OHEB+BtDAvtQLQGVbJUD/BrHAvtQLQGVbJUD/BrHACZabQL8OHEB+BtDAd1EMQBCIJUAbcrDAd1EMQBCIJUAbcrDACZabQL8OHEB+BtDAAnwMQP+3JUBV0q/AAnwMQP+3JUBV0q/ACZabQL8OHEB+BtDA2LA/QJwXJUDz6LHAAnwMQP+3JUBV0q/A2LA/QJwXJUDz6LHAR64+QAo1JUDYhrHAAnwMQP+3JUBV0q/AR64+QAo1JUDYhrHA4Oc9QGVbJUD/BrHAAnwMQP+3JUBV0q/A4Oc9QGVbJUD/BrHAJ2s9QBCIJUAbcrDAAnwMQP+3JUBV0q/AJ2s9QBCIJUAbcrDAnUA9QP+3JUBV0q/AAnwMQP+3JUBV0q/AnUA9QP+3JUBV0q/AjUA9QDesL0BDpI7A2LA/QJwXJUDz6LHACZabQL8OHEB+BtDA891AQBsFJUCfJrLA891AQBsFJUCfJrLACZabQL8OHEB+BtDAEyFCQMz+JECoO7LAEyFCQMz+JECoO7LACZabQL8OHEB+BtDAM2RDQBsFJUCfJrLAM2RDQBsFJUCfJrLACZabQL8OHEB+BtDATpFEQJwXJUDz6LHATpFEQJwXJUDz6LHACZabQL8OHEB+BtDA35NFQAo1JUDYhrHA35NFQAo1JUDYhrHACZabQL8OHEB+BtDARlpGQGVbJUD/BrHARlpGQGVbJUD/BrHACZabQL8OHEB+BtDA/tZGQBCIJUAbcrDA/tZGQBCIJUAbcrDACZabQL8OHEB+BtDAiQFHQP+3JUBV0q/AiQFHQP+3JUBV0q/ACZabQL8OHEB+BtDAyjN5QEwxJUBTk7HAiQFHQP+3JUBV0q/AyjN5QEwxJUBTk7HAYm14QKdXJUB6E7HAiQFHQP+3JUBV0q/AYm14QKdXJUB6E7HAqvB3QFGEJUCWfrDAiQFHQP+3JUBV0q/AqvB3QFGEJUCWfrDAIMZ3QD+0JUDQ3q/AiQFHQP+3JUBV0q/AIMZ3QD+0JUDQ3q/AFcZ3QDesL0BDpI7AyjN5QEwxJUBTk7HACZabQL8OHEB+BtDAWzZ6QN0TJUBu9bHAWzZ6QN0TJUBu9bHACZabQL8OHEB+BtDAdmN7QF0BJUAaM7LAdmN7QF0BJUAaM7LACZabQL8OHEB+BtDAlqZ8QA77JEAjSLLAlqZ8QA77JEAjSLLACZabQL8OHEB+BtDAtul9QF0BJUAaM7LAtul9QF0BJUAaM7LACZabQL8OHEB+BtDA0RZ/QN0TJUBu9bHA0RZ/QN0TJUBu9bHACZabQL8OHEB+BtDAsAyAQEwxJUBTk7HAsAyAQEwxJUBTk7HACZabQL8OHEB+BtDA5G+AQKdXJUB6E7HA5G+AQKdXJUB6E7HACZabQL8OHEB+BtDAQK6AQFGEJUCWfrDAQK6AQFGEJUCWfrDACZabQL8OHEB+BtDAhsOAQD+0JUDQ3q/A6CuaP4NROUCN+lzAW1gGQBpfMED6T4zACZabQINROUCN+lzAW1gGQBpfMED6T4zA6CuaP4NROUCN+lzAQCsFQJlMMECljYzAQCsFQJlMMECljYzA6CuaP4NROUCN+lzAsCgEQCsvMEC/74zAsCgEQCsvMEC/74zA6CuaP4NROUCN+lzASGIDQNAIMECab43ASGIDQNAIMECab43A6CuaP4NROUCN+lzAj+UCQCbcL0B9BI7Aj+UCQCbcL0B9BI7A6CuaP4NROUCN+lzABbsCQDesL0BDpI7ACZabQINROUCN+lzAW1gGQBpfMED6T4zAe5sHQGplMEDwOozACZabQINROUCN+lzAe5sHQGplMEDwOozAnN4IQBpfMED6T4zACZabQINROUCN+lzAnN4IQBpfMED6T4zAtgsKQJlMMECljYzACZabQINROUCN+lzAtgsKQJlMMECljYzARw4LQCsvMEC/74zACZabQINROUCN+lzARw4LQCsvMEC/74zArtQLQNAIMECab43ACZabQINROUCN+lzArtQLQNAIMECab43AZ1EMQCbcL0B9BI7ACZabQINROUCN+lzAZ1EMQCbcL0B9BI7A8XsMQDesL0BDpI7ACZabQINROUCN+lzA8XsMQDesL0BDpI7AyLA/QJlMMECljYzAyLA/QJlMMECljYzA8XsMQDesL0BDpI7AN64+QCsvMEC/74zAN64+QCsvMEC/74zA8XsMQDesL0BDpI7A0Oc9QNAIMECab43A0Oc9QNAIMECab43A8XsMQDesL0BDpI7AAnwMQP+3JUBV0q/A0Oc9QNAIMECab43AAnwMQP+3JUBV0q/AF2s9QCbcL0B9BI7AF2s9QCbcL0B9BI7AAnwMQP+3JUBV0q/AjUA9QDesL0BDpI7ACZabQINROUCN+lzAyLA/QJlMMECljYzA491AQBpfMED6T4zACZabQINROUCN+lzA491AQBpfMED6T4zAAyFCQGplMEDwOozACZabQINROUCN+lzAAyFCQGplMEDwOozAI2RDQBpfMED6T4zACZabQINROUCN+lzAI2RDQBpfMED6T4zAPpFEQJlMMECljYzACZabQINROUCN+lzAPpFEQJlMMECljYzAz5NFQCsvMEC/74zACZabQINROUCN+lzAz5NFQCsvMEC/74zANlpGQNAIMECab43ACZabQINROUCN+lzANlpGQNAIMECab43A7tZGQCbcL0B9BI7ACZabQINROUCN+lzA7tZGQCbcL0B9BI7AeQFHQDesL0BDpI7ACZabQINROUCN+lzAeQFHQDesL0BDpI7AvzN5QCsvMEC/74zAvzN5QCsvMEC/74zAeQFHQDesL0BDpI7AV214QNAIMECab43AV214QNAIMECab43AeQFHQDesL0BDpI7AiQFHQP+3JUBV0q/AV214QNAIMECab43AiQFHQP+3JUBV0q/AnvB3QCbcL0B9BI7AnvB3QCbcL0B9BI7AiQFHQP+3JUBV0q/AFcZ3QDesL0BDpI7ACZabQINROUCN+lzAvzN5QCsvMEC/74zAUDZ6QJlMMECljYzACZabQINROUCN+lzAUDZ6QJlMMECljYzAamN7QBpfMED6T4zACZabQINROUCN+lzAamN7QBpfMED6T4zAiqZ8QGplMEDwOozACZabQINROUCN+lzAiqZ8QGplMEDwOozAq+l9QBpfMED6T4zACZabQINROUCN+lzAq+l9QBpfMED6T4zAxRZ/QJlMMECljYzACZabQINROUCN+lzAxRZ/QJlMMECljYzAqwyAQCsvMEC/74zA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","parts":{"floor":[0,6],"rear":[6,6],"wall":[12,108],"sill":[120,240],"ceiling":[360,870]},"rear":{"x0":1.2044648529052735,"x1":4.862064852905274,"y0":0.0,"y1":2.4383999999999997},"room":{"x0":1.2044648529052735,"x1":4.862064852905274,"z0":-6.500792346191406,"z1":-3.4527923461914063},"lights":[{"x":3.9476674690246583,"y":2.5891265475591023,"z":-5.495948674265543,"r":0.07620009689331737},{"x":2.11886871248881,"y":2.589355094655355,"z":-5.494425156148274,"r":0.07620001614891259},{"x":3.03326871248881,"y":2.589355094655355,"z":-5.494425156148274,"r":0.07620001614891259},{"x":2.118864836756388,"y":2.7448861212412514,"z":-4.457551656341552,"r":0.07620001614894682},{"x":3.033264836756388,"y":2.7448861212412514,"z":-4.457551656341552,"r":0.07620001614894682},{"x":3.947664820607503,"y":2.7448861212412514,"z":-4.457551656341552,"r":0.07620003229783202}],"ceiling":{"ny":-0.14834056120736996,"nz":-0.9889363366050347,"d":-132.90467312120762,"inch":0.0254},"ceilingNormal":[-9.831762025193267e-08,-0.9889364008281541,0.14834013289218725]};
 
 const FLOORS = [
+  { id: "light-maple", name: "Light maple", kind: "wood", world: 1.6, planks: 7, along: 3.6, rings: 12, sharp: 16,
+    light: [236, 220, 196], dark: [198, 166, 124], seed: 7, rough: 0.72 },
   { id: "white-oak", name: "White oak", kind: "wood", world: 1.7, planks: 6, along: 3.2, rings: 7, sharp: 10,
     light: [222, 206, 178], dark: [158, 124, 82], seed: 3, rough: 0.78 },
   { id: "oak", name: "Natural oak", kind: "wood", world: 1.45, planks: 8, along: 4, rings: 9, sharp: 7,
     light: [198, 148, 92], dark: [112, 70, 36], seed: 11, rough: 0.74 },
+  { id: "cherry", name: "Cherry", kind: "wood", world: 1.5, planks: 7, along: 3.8, rings: 8, sharp: 8,
+    light: [186, 108, 74], dark: [120, 58, 40], seed: 23, rough: 0.7 },
   { id: "walnut", name: "Walnut", kind: "wood", world: 1.55, planks: 6, along: 3.4, rings: 8, sharp: 6,
     light: [118, 78, 50], dark: [58, 34, 24], seed: 19, rough: 0.7 },
-  { id: "limestone", name: "Limestone", kind: "tile", world: 1.35, tiles: 2, grout: 0.035,
-    light: [214, 206, 190], dark: [168, 158, 140], groutColor: [148, 140, 128], seed: 4, rough: 0.92 },
-  { id: "slate", name: "Slate", kind: "tile", world: 1.15, tiles: 3, grout: 0.04,
-    light: [128, 134, 128], dark: [78, 86, 84], groutColor: [62, 64, 62], seed: 8, rough: 0.88 },
-  { id: "terracotta", name: "Terracotta", kind: "tile", world: 1.05, tiles: 4, grout: 0.045,
-    light: [186, 104, 70], dark: [140, 68, 46], groutColor: [112, 96, 84], seed: 15, rough: 0.66 },
 ];
 
 const SILLS = [
@@ -361,17 +366,6 @@ function mix3(a, b, t) {
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 }
 function byte(v) { return v < 0 ? 0 : v > 255 ? 255 : v | 0; }
-
-function fbm(x, y) {
-  const x0 = Math.floor(x), y0 = Math.floor(y);
-  const fx = x - x0, fy = y - y0;
-  const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
-  const n00 = hash2(x0, y0), n10 = hash2(x0 + 1, y0);
-  const n01 = hash2(x0, y0 + 1), n11 = hash2(x0 + 1, y0 + 1);
-  const a = lerp(n00, n10, sx);
-  const b = lerp(n01, n11, sx);
-  return lerp(a, b, sy);
-}
 
 function canvasTexture(canvas, repeat) {
   const tex = new THREE.CanvasTexture(canvas);
@@ -429,52 +423,8 @@ function makeWood(spec) {
   return canvasTexture(canvas, true);
 }
 
-function makeTile(spec) {
-  const size = 512;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  const image = ctx.createImageData(size, size);
-  const data = image.data;
-  const tiles = spec.tiles;
-  const grout = spec.grout;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const u = x / size;
-      const v = y / size;
-      const gx = u * tiles;
-      const gy = v * tiles;
-      const tx = Math.floor(gx);
-      const ty = Math.floor(gy);
-      const fx = gx - tx;
-      const fy = gy - ty;
-      const edge = fx < grout || fy < grout || fx > 1 - grout || fy > 1 - grout;
-      const mottling = fbm((x + spec.seed * 13) * 0.035, (y + spec.seed * 7) * 0.035);
-      const variation = (hash2(tx + spec.seed, ty) - 0.5) * 0.35;
-      let col;
-      if (edge) {
-        const grit = (hash2(x, y) - 0.5) * 16;
-        col = spec.groutColor.map((c) => c + grit);
-      } else {
-        const shade = Math.max(0, Math.min(1, mottling * 0.85 + variation + 0.15));
-        col = mix3(spec.light, spec.dark, shade);
-        const speck = hash2(x * 3 + tx, y * 5 + ty);
-        if (speck > 0.992) col = col.map((c) => c * 0.72);
-      }
-      const i = (y * size + x) * 4;
-      data[i] = byte(col[0]);
-      data[i + 1] = byte(col[1]);
-      data[i + 2] = byte(col[2]);
-      data[i + 3] = 255;
-    }
-  }
-  ctx.putImageData(image, 0, 0);
-  return canvasTexture(canvas, true);
-}
-
 function makeTexture(spec) {
-  return spec.kind === "tile" ? makeTile(spec) : makeWood(spec);
+  return makeWood(spec);
 }
 
 function swatch(texture) {
@@ -696,16 +646,16 @@ function textureFor(spec) {
 }
 
 const PALETTES = [
-  { id: "plaster", name: "Plaster", wall: "#d9d2c5", ceiling: "#f3f0e8", floor: "white-oak", sill: "maple" },
-  { id: "paper", name: "Paper", wall: "#d4cbb6", ceiling: "#f4efe6", floor: "limestone", sill: "painted" },
+  { id: "plaster", name: "Plaster", wall: "#d9d2c5", ceiling: "#f3f0e8", floor: "light-maple", sill: "maple" },
+  { id: "paper", name: "Paper", wall: "#d4cbb6", ceiling: "#f4efe6", floor: "light-maple", sill: "painted" },
   { id: "olive", name: "Olive", wall: "#8a8974", ceiling: "#e6e4d8", floor: "white-oak", sill: "white-oak" },
   { id: "ink", name: "Ink", wall: "#3e423c", ceiling: "#d5d0c4", floor: "walnut", sill: "ebonized" },
-  { id: "pine", name: "Pine", wall: "#6a8082", ceiling: "#e4eeea", floor: "slate", sill: "painted" },
+  { id: "pine", name: "Pine", wall: "#6a8082", ceiling: "#e4eeea", floor: "white-oak", sill: "painted" },
   { id: "straw", name: "Straw", wall: "#c2a56e", ceiling: "#f3ebd4", floor: "oak", sill: "cherry" },
-  { id: "lichen", name: "Lichen", wall: "#a3a496", ceiling: "#f0f1ea", floor: "limestone", sill: "maple" },
+  { id: "lichen", name: "Lichen", wall: "#a3a496", ceiling: "#f0f1ea", floor: "light-maple", sill: "maple" },
   { id: "branch", name: "Branch", wall: "#6a6858", ceiling: "#e7e3d6", floor: "walnut", sill: "walnut" },
   { id: "mist", name: "Mist", wall: "#d2dcd7", ceiling: "#f6f7f4", floor: "white-oak", sill: "painted" },
-  { id: "clay", name: "Clay", wall: "#a68b70", ceiling: "#f2e9de", floor: "terracotta", sill: "cherry" },
+  { id: "clay", name: "Clay", wall: "#a68b70", ceiling: "#f2e9de", floor: "cherry", sill: "cherry" },
 ];
 
 function clearPalettes() {
@@ -899,31 +849,41 @@ canvas.addEventListener("wheel", (event) => {
   applyLook();
 }, { passive: false });
 
-function applyLighting() {
-  const night = document.querySelector('[data-time="night"]').classList.contains("is-on");
+const sceneLight = { night: false };
+
+function applyLamps() {
   const kelvin = Number(document.getElementById("kelvin").value);
+  const brightness = Number(document.getElementById("brightness").value) / 100;
   const lamp = kelvinToColor(kelvin);
-  document.body.dataset.time = night ? "night" : "day";
   document.getElementById("kelvin-num").textContent = `${kelvin} K`;
   document.getElementById("kelvin-dot").style.background = `#${lamp.getHexString()}`;
+  document.getElementById("brightness-out").textContent = `${Math.round(brightness * 100)}%`;
   document.querySelectorAll("#kelvin-presets button").forEach((button) => {
     button.classList.toggle("is-on", Number(button.dataset.k) === kelvin);
   });
   lampMat.color.copy(lamp);
+  const intensity = (sceneLight.night ? 12 : 0.9) * brightness;
   spots.forEach((spot) => {
     spot.color.copy(lamp);
-    spot.intensity = night ? 6 : 0.45;
+    spot.intensity = intensity;
   });
+  if (sceneLight.night) hemi.groundColor.copy(lamp);
+}
+
+function applyScene() {
+  const night = sceneLight.night;
+  document.body.dataset.time = night ? "night" : "day";
   sun.intensity = night ? 0 : 1.05;
   sun.castShadow = !night;
   fill.intensity = night ? 0.04 : 0.18;
   hemi.intensity = night ? 0.2 : 0.38;
   hemi.color.set(night ? "#243044" : "#d5e6f4");
-  hemi.groundColor.copy(night ? lamp : new THREE.Color("#d9d0c2"));
+  if (!night) hemi.groundColor.set("#d9d0c2");
   ambient.intensity = night ? 0.04 : 0.05;
   scene.background.set(night ? "#152033" : "#c5d7e6");
   groundMat.color.set(night ? "#14170f" : "#8d947c");
   renderer.toneMappingExposure = night ? 0.95 : 1;
+  applyLamps();
 }
 
 function applyPaint() {
@@ -938,15 +898,17 @@ document.querySelectorAll(".segment button").forEach((button) => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".segment button").forEach((el) => el.classList.remove("is-on"));
     button.classList.add("is-on");
-    applyLighting();
+    sceneLight.night = button.dataset.time === "night";
+    applyScene();
   });
 });
-document.getElementById("kelvin").addEventListener("input", applyLighting);
+document.getElementById("kelvin").addEventListener("input", applyLamps);
+document.getElementById("brightness").addEventListener("input", applyLamps);
 document.getElementById("kelvin-presets").addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
   document.getElementById("kelvin").value = button.dataset.k;
-  applyLighting();
+  applyLamps();
 });
 document.getElementById("wall-color").addEventListener("input", () => {
   clearPalettes();
@@ -968,6 +930,7 @@ if (params.get("time") === "night") {
   document.querySelector('[data-time="day"]').classList.remove("is-on");
   document.querySelector('[data-time="night"]').classList.add("is-on");
 }
+sceneLight.night = document.querySelector('[data-time="night"]').classList.contains("is-on");
 if (params.get("kelvin")) document.getElementById("kelvin").value = params.get("kelvin");
 if (params.get("wall")) document.getElementById("wall-color").value = params.get("wall");
 if (params.get("ceiling")) document.getElementById("ceiling-color").value = params.get("ceiling");
@@ -993,7 +956,7 @@ const matched = PALETTES.find((scheme) =>
 );
 if (matched) document.querySelector(`#palettes button[data-id="${matched.id}"]`).classList.add("is-on");
 
-applyLighting();
+applyScene();
 applyPaint();
 
 const wallpaper = document.getElementById("wallpaper");
